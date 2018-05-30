@@ -16,9 +16,9 @@ if __name__ == '__main__':
                                           p_min,
                                           fake_class_prob_to_get)
 
-    population_size = 3
-    pixels_percentage_to_change = 0.01
-    max_generations_count = 10
+    population_size = 300
+    pixels_percentage_to_change = 0.1
+    max_generations_count = 1000
     population_percentage_to_keep = 0.5
     mutation_prob = 0.5
     crossover_prob = 0.5

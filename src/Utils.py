@@ -4,10 +4,13 @@ from keras.preprocessing import image
 import numpy as np
 import time
 
+from Config import ROOT_PATH
+
+
 class Utils(object):
     @staticmethod
     def get_path(path):
-        return os.path.join(os.path.dirname(__file__), path)
+        return os.path.join(ROOT_PATH, path)
 
     @staticmethod
     def get_test_image_path(path, test_images_parent_dir="test_images", extension=".jpg"):
@@ -16,7 +19,7 @@ class Utils(object):
     @staticmethod
     def load_classes_csv(classes_csv_path):
         classes_csv = {}
-        with open(classes_csv_path, newline='') as csvfile:
+        with open(Utils.get_path(classes_csv_path), newline='') as csvfile:
             classes = csv.reader(csvfile, delimiter=',', quotechar='|')
             next(classes, None)
             for id_name in classes:
@@ -25,7 +28,7 @@ class Utils(object):
 
     @staticmethod
     def prepare_img(img_path):
-        img = image.load_img(img_path, target_size=(299, 299))
+        img = image.load_img(Utils.get_path(img_path), target_size=(299, 299))
         img_array = image.img_to_array(img)
 
         # Scale the image so all pixel intensities are between [-1, 1] as the model expects

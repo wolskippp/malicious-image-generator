@@ -9,13 +9,14 @@ from src.FakeImgCandidate import FakeImgCandidate
 class FakeImgGenerator(object):
     def __init__(self, img_path, class_name_to_fake, p_max, p_min, fake_class_prob_to_get):
         self.img = Utils.prepare_img(img_path)
-        self.class_name_to_fake = class_name_to_fake
+
         self.p_max = p_max
         self.p_min = p_min
         self.fake_class_prob_to_get = fake_class_prob_to_get
-        self.keras = Keras("src/imagenet_classes.csv")
+        self.keras = Keras("src/imagenet_classes.csv", class_name_to_fake)
 
-    def run(self, population_size, pixels_percentage_to_change, max_generations_count, population_percentage_to_keep, mutation_prob, crossover_prob):
+    def run(self, population_size, pixels_percentage_to_change, max_generations_count, population_percentage_to_keep,
+            mutation_prob, crossover_prob):
         pixels_to_change_count = int(self.img.shape[0] * self.img.shape[1] * pixels_percentage_to_change)
         population = self._init_population(population_size, pixels_to_change_count)
 
@@ -27,9 +28,11 @@ class FakeImgGenerator(object):
 
             for i, img_candidate in enumerate(population.fakeImgCandidates):
                 # population.fakeImgCandidates[i].probability = random.uniform(0,1)
-                population.fakeImgCandidates[i].probability = self.keras.get_prediction_on_custom_class(img_candidate.img, self.class_name_to_fake)
+                population.fakeImgCandidates[i].probability = self.keras.get_prediction_on_custom_class(
+                    img_candidate.img)
 
             best_img = self._get_best_img_candidate(population.fakeImgCandidates)
+            print('best from {} population : {}'.format(generations_counter, str(best_img.probability)))
             if best_img.probability >= self.fake_class_prob_to_get:
                 print("Fake image generation succeeded")
                 return Utils.save_img(best_img)
@@ -38,6 +41,7 @@ class FakeImgGenerator(object):
             new_population = self._crossover(population, selected_imgs, crossover_prob)
             new_population = self._mutation(new_population, mutation_prob)
             population = new_population
+            generations_counter += 1
 
     def _init_population(self, population_size, pixels_to_change_count):
         population = Population()
@@ -93,11 +97,12 @@ class FakeImgGenerator(object):
         new_population = Population()
         new_population.phenotype = population.phenotype
         for i in range(len(population.fakeImgCandidates)):
-            parent_1 = selected_imgs[random.randint(0, len(selected_imgs)-1)]
-            parent_2 = selected_imgs[random.randint(0, len(selected_imgs)-1)]
+            parent_1 = selected_imgs[random.randint(0, len(selected_imgs) - 1)]
+            parent_2 = selected_imgs[random.randint(0, len(selected_imgs) - 1)]
             child = FakeImgCandidate(np.copy(self.img))
             for x, y in population.phenotype:
-                new_pixel_value = (parent_1.get_pixel_value(x, y) * crossover_prob + parent_2.get_pixel_value(x, y) * (1-crossover_prob))/2
+                new_pixel_value = (parent_1.get_pixel_value(x, y) * crossover_prob + parent_2.get_pixel_value(x, y) * (
+                            1 - crossover_prob)) / 2
                 child.set_pixel_value(x, y, new_pixel_value)
             new_population.add_img(child)
         return new_population
