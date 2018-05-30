@@ -1,40 +1,31 @@
 import numpy as np
 from keras import backend as K
 from keras.applications import inception_v3
-from keras.preprocessing import image
 
-from utils import Utils
+from src.Utils import Utils
 
 
 class Keras:
+    def __init__(self, classes_csv_path):
+        self.classname_to_id = Utils.load_classes_csv(classes_csv_path)
+
     @staticmethod
-    def get_prediction(test_image_name):
+    def get_prediction(img):
         # Load pre-trained image recognition model
-        model = inception_v3.InceptionV3()
-
-        full_path = Utils.get_test_image(test_image_name)
-        # Load the image file and convert it to a numpy array
-        img = image.load_img(full_path, target_size=(299, 299))
-        input_image = image.img_to_array(img)
-
-        # Scale the image so all pixel intensities are between [-1, 1] as the model expects
-        input_image /= 255.
-        input_image -= 0.5
-        input_image *= 2.
+        model = inception_v3.InceptionV3() # todo wyrzucić jako pole klasy? Bo nie zmieniamy nigdzie samego modelu?
 
         # Add a 4th dimension for batch size (as Keras expects)
-        input_image = np.expand_dims(input_image, axis=0)
+        img_array = np.expand_dims(img, axis=0)
 
         # Run the image through the neural network
-        predictions = model.predict(input_image)
+        predictions = model.predict(img_array)
 
         # Convert the predictions into text and print them
         predicted_classes = inception_v3.decode_predictions(predictions, top=1)
         imagenet_id, name, confidence = predicted_classes[0][0]
         print("This is a {} with {:.4}% confidence!".format(name, confidence * 100))
 
-    @staticmethod
-    def check_prediction_on_custom_class(file_name, object_type_to_fake):
+    def get_prediction_on_custom_class(self, img, class_name_to_fake):
         # Load pre-trained image recognition model
         model = inception_v3.InceptionV3()
 
@@ -42,24 +33,15 @@ class Keras:
         model_input_layer = model.layers[0].input
         model_output_layer = model.layers[-1].output
 
-        full_path = Utils.get_test_image(file_name)
-        # Load the image to hack
-        img = image.load_img(full_path, target_size=(299, 299))
-        original_image = image.img_to_array(img)
-
-        # Scale the image so all pixel intensities are between [-1, 1] as the model expects
-        original_image /= 255.
-        original_image -= 0.5
-        original_image *= 2.
-
         # Add a 4th dimension for batch size (as Keras expects)
-        original_image = np.expand_dims(original_image, axis=0)
+        img_array = np.expand_dims(img, axis=0)
+
         # Create a copy of the input image to hack on
-        hacked_image = np.copy(original_image)
+        hacked_image = np.copy(img_array)
 
         # Define the cost function.
         # Our 'cost' will be the likelihood out image is the target class according to the pre-trained model
-        cost_function = model_output_layer[0, object_type_to_fake]
+        cost_function = model_output_layer[0, self.classname_to_id[class_name_to_fake]]
 
         # We'll ask Keras to calculate the gradient based on the input image and the currently predicted class
         # In this case, referring to "model_input_layer" will give us back image we are hacking.
@@ -72,4 +54,8 @@ class Keras:
         cost = 0.0
         cost, gradients = grab_cost_and_gradients_from_model([hacked_image, 0])
 
-        print("Model's predicted likelihood that the image is a toaster: {:.8}%".format(cost * 100))
+        print("Model's predicted likelihood that the image is a {}: {:.8}%".format(class_name_to_fake, cost * 100))
+        return cost * 100
+
+    def get_class_id(self, class_name):
+        return self.classname_to_id[class_name]
