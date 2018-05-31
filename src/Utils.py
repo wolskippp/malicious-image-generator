@@ -29,7 +29,7 @@ class Utils(object):
 
     @staticmethod
     def prepare_img(img_path):
-        img = image.load_img(Utils.get_path(img_path), target_size=(299, 299))
+        img = image.load_img(Utils.get_path(img_path), target_size=(255, 255))
         img_array = image.img_to_array(img)
 
         # Scale the image so all pixel intensities are between [-1, 1] as the model expects
@@ -41,7 +41,7 @@ class Utils(object):
 
     @staticmethod
     def save_img(img, filename_sufix):
-        img /=2
+        img /= 2
         img += 0.5
         img *= 255
         img_to_save = Image.fromarray(img.astype(np.uint8))
