@@ -9,7 +9,6 @@ from src.FakeImgCandidate import FakeImgCandidate
 class FakeImgGenerator(object):
     def __init__(self, img_path, class_name_to_fake, p_max, p_min, fake_class_prob_to_get):
         self.img = Utils.prepare_img(img_path)
-
         self.p_max = p_max
         self.p_min = p_min
         self.fake_class_prob_to_get = fake_class_prob_to_get
@@ -35,7 +34,7 @@ class FakeImgGenerator(object):
             print('best from {} population : {}'.format(generations_counter, str(best_img.probability)))
             if best_img.probability >= self.fake_class_prob_to_get:
                 print("Fake image generation succeeded")
-                return Utils.save_img(best_img)
+                return Utils.save_img(self.img, "fake_{}".format(self.keras.class_name_to_fake))
 
             selected_imgs = self._selection(population.fakeImgCandidates, population_percentage_to_keep)
             new_population = self._crossover(population, selected_imgs, crossover_prob)

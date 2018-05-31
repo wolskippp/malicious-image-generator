@@ -2,6 +2,7 @@ import os
 import csv
 from keras.preprocessing import image
 import numpy as np
+from PIL import Image
 import time
 
 from Config import ROOT_PATH
@@ -39,6 +40,13 @@ class Utils(object):
         return img_array
 
     @staticmethod
-    def save_img(img_candidate):
-        current_time = time.strftime("%m%d_%H%M%S")
-        print("TODO, save img")
+    def save_img(img, filename_sufix):
+        img /=2
+        img += 0.5
+        img *= 255
+        img_to_save = Image.fromarray(img.astype(np.uint8))
+
+        current_time = time.strftime("%d%m_%H%M%S")
+        result_path = Utils.get_path("test_images\output\{}_{}.jpg".format(current_time, filename_sufix))
+        img_to_save.save(result_path)
+        return result_path
