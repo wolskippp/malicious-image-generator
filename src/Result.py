@@ -43,8 +43,11 @@ class Result(object):
     def stop(self):
         self.running_time = time.time() - self.start_time
 
-    def get_max_probability(self):
-        return max(self.results)
+    def get_last_probability(self):
+        if self.results:
+            return self.results[-1]
+        else:
+            return -1
 
     def save(self, output_dir):
         Utils.save_chart(self._generate_chart(), Utils.get_path("chart.png", basepath=output_dir))
@@ -61,8 +64,8 @@ class Result(object):
         x_data = range(1, len(self.results)+1)
         y_data = self.results
         plt.scatter(x_data, y_data)
-        plt.xticks(x_data)
-        plt.ylabel("Fake class probability")
+        # plt.xticks(x_data)
+        plt.ylabel("Probability")
         plt.xlabel("Generations")
         plt.title("Results in following generations")
         return plt
@@ -83,4 +86,5 @@ class Result(object):
                          "Crossover probability: {}".format(self.crossover_prob),
                          "",
                          "### Results:",
-                         "Running time: {}".format(self._get_formatted_running_time())])
+                         "Running time: {}".format(self._get_formatted_running_time()),
+                         "Probability: {}".format(self.get_last_probability())])

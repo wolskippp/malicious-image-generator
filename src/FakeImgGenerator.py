@@ -39,11 +39,10 @@ class FakeImgGenerator(object):
         while True:
             if generations_counter > max_generations_count:
                 print("Generations count exceeded the limit, "
-                      "generated image has probability {}.".format(result.get_max_probability()))
+                      "last generated image has probability {}.".format(result.get_last_probability()))
                 break
 
             for i, img_candidate in enumerate(population.fakeImgCandidates):
-                # population.fakeImgCandidates[i].probability = random.uniform(0,0.5)
                 # population.fakeImgCandidates[i].probability = random.uniform(0,self.fake_class_prob_to_get - 0.1)
                 population.fakeImgCandidates[i].probability = self.keras.get_prediction_on_custom_class(
                     img_candidate.img)
@@ -55,11 +54,9 @@ class FakeImgGenerator(object):
             print('The best probablity from {} population : {}'.format(generations_counter, str(best_img.probability)))
             if best_img.probability <= self.fake_class_prob_to_get:
                 print("Fake image generation succeeded, "
-                      "the generated image has probability {}.".format(result.get_max_probability()))
+                      "the generated image has probability {}.".format(result.get_last_probability()))
                 self.keras.get_prediction(best_img.img) # po co to?
                 break
-
-                #return Utils.save_img(best_img.img, "fake_{}".format(self.keras.class_name_to_fake))
 
             selected_imgs = self._selection(population.fakeImgCandidates, population_size_to_keep)
             new_population = self._crossover(population, selected_imgs, crossover_prob)
