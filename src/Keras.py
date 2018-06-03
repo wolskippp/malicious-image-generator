@@ -20,6 +20,7 @@ class Keras:
 
         # Define the cost function.
         # Our 'cost' will be the likelihood out image is the target class according to the pre-trained model
+        # todo this comment should be changed according to the new project idea
         cost_function = model_output_layer[0, self.classname_to_id[self.class_name_to_fake]]
 
         # We'll ask Keras to calculate the gradient based on the input image and the currently predicted class

@@ -4,6 +4,7 @@ import random
 import numpy as np
 from src.Population import Population
 from src.FakeImgCandidate import FakeImgCandidate
+from src.Result import Result
 
 
 class FakeImgGenerator(object):
@@ -16,31 +17,51 @@ class FakeImgGenerator(object):
 
     def run(self, population_size, pixels_percentage_to_change, max_generations_count, population_percentage_to_keep,
             mutation_prob, crossover_prob):
+
+        result = Result(class_name_to_fake=self.keras.class_name_to_fake,
+                        p_max=self.p_max,
+                        p_min=self.p_min,
+                        fake_class_prob_to_get=self.fake_class_prob_to_get,
+                        population_size=population_size,
+                        pixels_percentage_to_change=pixels_percentage_to_change,
+                        max_generation_count=max_generations_count,
+                        population_percentage_to_keep=population_percentage_to_keep,
+                        mutation_prob=mutation_prob,
+                        crossover_prob=crossover_prob)
+
         pixels_to_change_count = int(self.img.shape[0] * self.img.shape[1] * pixels_percentage_to_change)
         population = self._init_population(population_size, pixels_to_change_count)
 
         generations_counter = 0
+        result.start()
         while True:
             if generations_counter > max_generations_count:
-                print("Generations count exceeded the limit, fake image generation failed.")
-                return
+                print("Generations count exceeded the limit, "
+                      "generated image has probability {}.".format(result.get_max_probability()))
+                break
 
             for i, img_candidate in enumerate(population.fakeImgCandidates):
-                # population.fakeImgCandidates[i].probability = random.uniform(0,1)
+                # population.fakeImgCandidates[i].probability = random.uniform(0,0.5)
                 population.fakeImgCandidates[i].probability = self.keras.get_prediction_on_custom_class(
                     img_candidate.img)
 
             best_img = self._get_best_img_candidate(population.fakeImgCandidates)
-            print('best from {} population : {}'.format(generations_counter, str(best_img.probability)))
+            result.add_best_current_probability(best_img.probability)
+            result.set_result_img(best_img.img)
+
+            print('The best probablity from {} population : {}'.format(generations_counter, str(best_img.probability)))
             if best_img.probability >= self.fake_class_prob_to_get:
-                print("Fake image generation succeeded")
-                return Utils.save_img(self.img, "fake_{}".format(self.keras.class_name_to_fake))
+                print("Fake image generation succeeded, "
+                      "the generated image has probability {}.".format(result.get_max_probability()))
+                break
 
             selected_imgs = self._selection(population.fakeImgCandidates, population_percentage_to_keep)
             new_population = self._crossover(population, selected_imgs, crossover_prob)
             new_population = self._mutation(new_population, mutation_prob)
             population = new_population
             generations_counter += 1
+        result.stop()
+        return result
 
     def _init_population(self, population_size, pixels_to_change_count):
         population = Population()
