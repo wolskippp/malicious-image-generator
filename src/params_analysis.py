@@ -50,7 +50,7 @@ def _save_results_comparison(results, output_dir):
         content = []
         results_probabilities_times = [(r.get_last_probability(), r.running_time) for r in results]
 
-        if all([prob_time[0] < FAKE_CLASS_PROB_TO_GET for prob_time in results_probabilities_times]):
+        if all([prob_time[0] > FAKE_CLASS_PROB_TO_GET for prob_time in results_probabilities_times]):
             content.append("No parameters set returned probability below FAKE_CLASS_PROB_TO_GET ({})\n".format(FAKE_CLASS_PROB_TO_GET))
             best_result = max([prob_time[0] for prob_time in results_probabilities_times])
             for i, prob_time in enumerate(results_probabilities_times):
@@ -61,7 +61,7 @@ def _save_results_comparison(results, output_dir):
                            " in time {}.".format(best_result, best_result_id, best_result_time))
         else:
             prob, shortest_time = min([prob_time for prob_time in results_probabilities_times
-                                    if prob_time[0] < FAKE_CLASS_PROB_TO_GET], key= lambda prob_time : prob_time[1])
+                                    if prob_time[0] <= FAKE_CLASS_PROB_TO_GET], key= lambda prob_time : prob_time[1])
             for i, prob_time in enumerate(results_probabilities_times):
                 if prob_time[0] == prob and prob_time[1] == shortest_time:
                     best_result_id = i
