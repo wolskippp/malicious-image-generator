@@ -10,11 +10,12 @@ from src.Result import Result
 class FakeImgGenerator(object):
     def __init__(self, img_path, p_max, p_min, fake_class_prob_to_get):
         self.img = Utils.prepare_img(img_path)
-
         self.p_max = p_max
         self.p_min = p_min
         self.fake_class_prob_to_get = fake_class_prob_to_get
         self.keras = Keras("src/imagenet_classes.csv", self.img)
+        self.image_max_values = self.img + self.p_max * 5
+        self.image_min_values = self.img + self.p_min * 5
 
     def run(self, population_size, pixels_percentage_to_change, max_generations_count, population_percentage_to_keep,
             mutation_prob, crossover_prob):
@@ -55,7 +56,7 @@ class FakeImgGenerator(object):
             if best_img.probability <= self.fake_class_prob_to_get:
                 print("Fake image generation succeeded, "
                       "the generated image has probability {}.".format(result.get_last_probability()))
-                self.keras.get_prediction(best_img.img) # po co to?
+                self.keras.get_prediction(best_img.img)
                 break
 
             selected_imgs = self._selection(population.fakeImgCandidates, population_size_to_keep)
@@ -84,20 +85,12 @@ class FakeImgGenerator(object):
                 current_pixel_value = fake_img_candidate.get_pixel_value(x, y)
                 new_pixel_value = self._generate_new_pixel_value(current_pixel_value)
                 fake_img_candidate.set_pixel_value(x, y, new_pixel_value)
-
+            fake_img_candidate.clip_all_image(self.image_min_values, self.image_max_values)
             population.add_img(fake_img_candidate)
 
         return population
 
     def _generate_new_pixel_value(self, current_pixel_value):
-        def cropp_to_valid_range(current_value):
-            if current_value < -1:
-                return -1
-            elif current_value > 1:
-                return 1
-            else:
-                return current_value
-
         current_R = current_pixel_value[0]
         current_G = current_pixel_value[1]
         current_B = current_pixel_value[2]
@@ -106,9 +99,9 @@ class FakeImgGenerator(object):
         change_G = random.uniform(self.p_min, self.p_max)
         change_B = random.uniform(self.p_min, self.p_max)
 
-        new_R = cropp_to_valid_range(current_R + change_R)
-        new_G = cropp_to_valid_range(current_G + change_G)
-        new_B = cropp_to_valid_range(current_B + change_B)
+        new_R = current_R + change_R
+        new_G = current_G + change_G
+        new_B = current_B + change_B
 
         return np.array([new_R, new_G, new_B])
 
@@ -137,6 +130,7 @@ class FakeImgGenerator(object):
                 if r <= crossover_prob:
                     new_pixel_value = (parent_1.get_pixel_value(x, y) + parent_2.get_pixel_value(x, y)) / 2
                     child.set_pixel_value(x, y, new_pixel_value)
+            child.clip_all_image(self.image_min_values, self.image_max_values)
             new_population.add_img(child)
         for selected_img in selected_imgs:
             new_population.add_img(selected_img)
@@ -151,5 +145,6 @@ class FakeImgGenerator(object):
                     current_pixel_value = img.get_pixel_value(x, y)
                     new_pixel_value = self._generate_new_pixel_value(current_pixel_value)
                     child.set_pixel_value(x, y, new_pixel_value)
+                child.clip_all_image(self.image_min_values, self.image_max_values)
                 population.add_img(child)
         return population
