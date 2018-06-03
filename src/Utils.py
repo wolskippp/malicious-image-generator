@@ -10,12 +10,26 @@ from Config import ROOT_PATH
 
 class Utils(object):
     @staticmethod
-    def get_path(path):
-        return os.path.join(ROOT_PATH, path)
+    def get_path(path, basepath=ROOT_PATH):
+        return os.path.join(basepath, path)
 
     @staticmethod
-    def get_test_image_path(path, test_images_parent_dir="test_images", extension=".jpg"):
-        return os.path.join(test_images_parent_dir, path + extension)
+    def get_test_image_path(imgname, test_images_parent_dir="test_images", extension=".jpg"):
+        return os.path.join(test_images_parent_dir, imgname + extension)
+
+    @staticmethod
+    def get_new_output_dir():
+        outputs_dir_path = Utils.create_child_dir("output")
+        new_output_dir_path = Utils.create_child_dir(basepath=outputs_dir_path,
+                                                     child_dir=time.strftime("%d%m_%H%M%S"))
+        return new_output_dir_path
+
+    @staticmethod
+    def create_child_dir(child_dir, basepath=ROOT_PATH):
+        child_dir_path = os.path.join(basepath, child_dir)
+        if not os.path.exists(child_dir_path):
+            os.mkdir(child_dir_path)
+        return child_dir_path
 
     @staticmethod
     def load_classes_csv(classes_csv_path):
@@ -29,7 +43,7 @@ class Utils(object):
 
     @staticmethod
     def prepare_img(img_path):
-        img = image.load_img(Utils.get_path(img_path), target_size=(299, 299))
+        img = image.load_img(Utils.get_path(img_path), target_size=(255, 255))
         img_array = image.img_to_array(img)
 
         # Scale the image so all pixel intensities are between [-1, 1] as the model expects
@@ -40,13 +54,22 @@ class Utils(object):
         return img_array
 
     @staticmethod
-    def save_img(img, filename_sufix):
-        img /=2
+    def save_img(img, filename_sufix=None, img_path=None):
+        img /= 2
         img += 0.5
         img *= 255
         img_to_save = Image.fromarray(img.astype(np.uint8))
 
-        current_time = time.strftime("%d%m_%H%M%S")
-        result_path = Utils.get_path("test_images\output\{}_{}.jpg".format(current_time, filename_sufix))
-        img_to_save.save(result_path)
-        return result_path
+        if img_path == None:
+            current_time = time.strftime("%d%m_%H%M%S")
+            result_path = Utils.get_path("test_images\output\{}_{}.jpg".format(current_time, filename_sufix))
+            img_to_save.save(result_path)
+            return result_path
+        else:
+            img_to_save.save(img_path)
+            return img_path
+
+    @staticmethod
+    def save_chart(chart, chart_path):
+        chart.savefig(chart_path)
+        chart.close()
