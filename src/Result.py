@@ -72,14 +72,13 @@ class Result(object):
 
     def _generate_summary(self):
         return "\n".join(["### Configuration:",
-                         "Class to fake: {}".format(self.class_name_to_fake),
                          "P_max: {}".format(self.p_max),
                          "P_min: {}".format(self.p_min),
                          "Fake class probability to get: {}".format(self.fake_class_prob_to_get),
                          "Population size: {}".format(self.population_size),
                          "Pixels percentage to change: {}".format(self.pixels_percentage_to_change),
                          "Max generations count: {}".format(self.max_generation_count),
-                         "Population percentage to keep".format(self.population_percentage_to_keep),
+                         "Population percentage to keep: {}".format(self.population_percentage_to_keep),
                          "Mutation probability: {}".format(self.mutation_prob),
                          "Crossover probability: {}".format(self.crossover_prob),
                          "",

@@ -23,7 +23,6 @@ def run_analysis():
                                                crossover_prob)
 
     fake_img_generator = FakeImgGenerator(Utils.get_test_image_path(IMG_NAME),
-                                          CLASS_NAME_TO_FAKE,
                                           P_MAX,
                                           P_MIN,
                                           FAKE_CLASS_PROB_TO_GET)
@@ -50,7 +49,7 @@ def _save_results_comparison(results, output_dir):
         results_probabilities_times = [(r.get_max_probability(), r.running_time) for r in results]
 
         if all([prob_time[0] < FAKE_CLASS_PROB_TO_GET for prob_time in results_probabilities_times]):
-            content.append("No parameters set exceeded FAKE_CLASS_PROB_TO_GET ({})\n".format(FAKE_CLASS_PROB_TO_GET))
+            content.append("No parameters set returned probability below FAKE_CLASS_PROB_TO_GET ({})\n".format(FAKE_CLASS_PROB_TO_GET))
             best_result = max([prob_time[0] for prob_time in results_probabilities_times])
             for i, prob_time in enumerate(results_probabilities_times):
                 if prob_time[0] == best_result:
@@ -64,7 +63,7 @@ def _save_results_comparison(results, output_dir):
             for i, prob_time in enumerate(results_probabilities_times):
                 if prob_time[0] == prob and prob_time[1] == shortest_time:
                     best_result_id = i
-            content.append("FAKE_CLASS_PROB_TO_GET ({}) was exceeded in the shortest time ({}s) "
+            content.append("The probability went below FAKE_CLASS_PROB_TO_GET ({}) was received in the shortest time ({}s) "
                            "by parameters set number {} and is {}".format(FAKE_CLASS_PROB_TO_GET,
                                                                           shortest_time, best_result_id, prob))
 

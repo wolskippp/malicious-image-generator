@@ -8,7 +8,7 @@ from src.Result import Result
 
 
 class FakeImgGenerator(object):
-    def __init__(self, img_path, class_name_to_fake, p_max, p_min, fake_class_prob_to_get):
+    def __init__(self, img_path, p_max, p_min, fake_class_prob_to_get):
         self.img = Utils.prepare_img(img_path)
 
         self.p_max = p_max
@@ -35,7 +35,7 @@ class FakeImgGenerator(object):
 
         generations_counter = 0
         population_size_to_keep = int(population_size * population_percentage_to_keep)
-		result.start()
+        result.start()
         while True:
             if generations_counter > max_generations_count:
                 print("Generations count exceeded the limit, "
@@ -56,7 +56,7 @@ class FakeImgGenerator(object):
             if best_img.probability <= self.fake_class_prob_to_get:
                 print("Fake image generation succeeded, "
                       "the generated image has probability {}.".format(result.get_max_probability()))
-				self.keras.get_prediction(best_img.img) # po co to?
+                self.keras.get_prediction(best_img.img) # po co to?
                 break
 
                 #return Utils.save_img(best_img.img, "fake_{}".format(self.keras.class_name_to_fake))
