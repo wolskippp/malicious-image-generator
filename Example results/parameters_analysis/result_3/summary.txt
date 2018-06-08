@@ -1,0 +1,14 @@
+### Configuration:
+P_max: 0.05
+P_min: -0.05
+Fake class probability to get: 20
+Population size: 150
+Pixels percentage to change: 0.4
+Max generations count: 500
+Population percentage to keep: 0.2
+Mutation probability: 0.7999999999999999
+Crossover probability: 0.4
+
+### Results:
+Running time: 1:27:45.002287
+Probability: 18.729831278324127

@@ -22,8 +22,7 @@ class Keras:
         model_output_layer = self.model.layers[-1].output
 
         # Define the cost function.
-        # Our 'cost' will be the likelihood out image is the target class according to the pre-trained model
-        # todo this comment should be changed according to the new project idea
+        # Our 'cost' to minimize will be the likelihood out image is the original class according to the pre-trained model
         cost_function = model_output_layer[0, self.classname_to_id[self.class_name_to_fake]]
 
         # Create a Keras function that we can call to calculate the current cost

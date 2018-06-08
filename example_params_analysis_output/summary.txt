@@ -1,3 +1,0 @@
-No parameters set returned probability below FAKE_CLASS_PROB_TO_GET (50)
-Best probability result is 1.072201911492074, received for paramaters set number 0
- in time 1.1653811931610107.

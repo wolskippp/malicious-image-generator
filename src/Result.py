@@ -3,6 +3,7 @@ from src.Utils import Utils
 from datetime import timedelta
 import matplotlib.pyplot as plt
 
+
 class Result(object):
     def __init__(self,
                  class_name_to_fake,
@@ -64,7 +65,7 @@ class Result(object):
         x_data = range(1, len(self.results)+1)
         y_data = self.results
         plt.scatter(x_data, y_data)
-        # plt.xticks(x_data)
+        plt.xticks(x_data)
         plt.ylabel("Probability")
         plt.xlabel("Generations")
         plt.title("Results in following generations")
@@ -75,16 +76,16 @@ class Result(object):
 
     def _generate_summary(self):
         return "\n".join(["### Configuration:",
-                         "P_max: {}".format(self.p_max),
-                         "P_min: {}".format(self.p_min),
-                         "Fake class probability to get: {}".format(self.fake_class_prob_to_get),
-                         "Population size: {}".format(self.population_size),
-                         "Pixels percentage to change: {}".format(self.pixels_percentage_to_change),
-                         "Max generations count: {}".format(self.max_generation_count),
-                         "Population percentage to keep: {}".format(self.population_percentage_to_keep),
-                         "Mutation probability: {}".format(self.mutation_prob),
-                         "Crossover probability: {}".format(self.crossover_prob),
-                         "",
-                         "### Results:",
-                         "Running time: {}".format(self._get_formatted_running_time()),
-                         "Probability: {}".format(self.get_last_probability())])
+                          "P_max: {}".format(self.p_max),
+                          "P_min: {}".format(self.p_min),
+                          "Fake class probability to get: {}".format(self.fake_class_prob_to_get),
+                          "Population size: {}".format(self.population_size),
+                          "Pixels percentage to change: {}".format(self.pixels_percentage_to_change),
+                          "Max generations count: {}".format(self.max_generation_count),
+                          "Population percentage to keep: {}".format(self.population_percentage_to_keep),
+                          "Mutation probability: {}".format(self.mutation_prob),
+                          "Crossover probability: {}".format(self.crossover_prob),
+                          "",
+                          "### Results:",
+                          "Running time: {}".format(self._get_formatted_running_time()),
+                          "Probability: {}".format(self.get_last_probability())])

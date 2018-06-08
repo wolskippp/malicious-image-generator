@@ -43,7 +43,6 @@ class FakeImgGenerator(object):
                 break
 
             for i, img_candidate in enumerate(population.fakeImgCandidates):
-                # population.fakeImgCandidates[i].probability = random.uniform(0,self.fake_class_prob_to_get - 0.1)
                 population.fakeImgCandidates[i].probability = self.keras.get_prediction_on_custom_class(
                     img_candidate.img)
 

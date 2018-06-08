@@ -1,15 +1,14 @@
 from src.FakeImgGenerator import FakeImgGenerator
 from src.Utils import Utils
-
+from Config import *
 
 if __name__ == '__main__':
-    img_name = "toaster"
-    # class_name_to_fake = "toy_poodle"
+    img_name = IMG_NAME
     img_path = Utils.get_test_image_path(img_name)
 
-    p_max = 0.1 # max 1
-    p_min = -0.1 # min -1
-    fake_class_prob_to_get = 50
+    p_max = P_MAX
+    p_min = P_MIN
+    fake_class_prob_to_get = FAKE_CLASS_PROB_TO_GET
     fake_img_generator = FakeImgGenerator(img_path,
                                           p_max,
                                           p_min,
@@ -17,10 +16,10 @@ if __name__ == '__main__':
                                           )
 
     population_size = 30
-    pixels_percentage_to_change = 0.5
-    max_generations_count = 1000
-    population_percentage_to_keep = 0.2
-    mutation_prob = 0.5
+    pixels_percentage_to_change = 0.4
+    max_generations_count = 100
+    population_percentage_to_keep = 0.1
+    mutation_prob = 0.6
     crossover_prob = 0.7
     result = fake_img_generator.run(population_size,
                                     pixels_percentage_to_change,
